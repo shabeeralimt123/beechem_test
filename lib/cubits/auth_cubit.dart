@@ -7,9 +7,8 @@ part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository _authRepository;
-  final SharedPreferences _prefs;
 
-  AuthCubit(this._authRepository, this._prefs) : super(AuthInitial()) {
+  AuthCubit(this._authRepository) : super(AuthInitial()) {
     loadRememberedEmail();
   }
 

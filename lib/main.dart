@@ -4,14 +4,25 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'cubits/auth_cubit.dart';
+import 'cubits/personnel_cubit.dart';
+import 'cubits/personnel_details_cubit.dart';
 import 'repositories/auth_repository.dart';
+import 'repositories/personnel_repository.dart';
+import 'repositories/personnel_details_repository.dart';
+import 'repositories/role_repository.dart';
 import 'screens/login_screen.dart';
 import 'screens/personnel_list_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
-  final dio = Dio();
+  final dio = Dio(
+    BaseOptions(
+      baseUrl: 'https://beechem.ishtech.live/api/',
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+    ),
+  );
 
   runApp(MyApp(prefs: prefs, dio: dio));
 }
@@ -29,12 +40,30 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(
           create: (context) => AuthRepository(dio),
         ),
+        RepositoryProvider(
+         create: (context) => PersonnelRepository(dio),
+       ),
+        RepositoryProvider(
+         create: (context) => PersonnelDetailsRepository(dio),
+       ),
         BlocProvider(
           create: (context) => AuthCubit(
             RepositoryProvider.of<AuthRepository>(context),
-            prefs,
           ),
         ),
+        BlocProvider(
+         create: (context) => PersonnelCubit(
+           RepositoryProvider.of<PersonnelRepository>(context),
+         ),
+       ),
+        BlocProvider(
+         create: (context) => PersonnelDetailsCubit(
+           RepositoryProvider.of<PersonnelDetailsRepository>(context),
+         ),
+       ),
+        RepositoryProvider(
+         create: (context) => RoleRepository(dio),
+       ),
       ],
       child: MaterialApp(
         title: 'BeeChem Test',
